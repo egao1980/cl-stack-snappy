@@ -1,0 +1,5 @@
+cl-stack-snappy bundles Snappy shared libraries built from upstream google/snappy
+(https://github.com/google/snappy). Snappy is licensed under a BSD-3-Clause
+license (https://github.com/google/snappy/blob/main/COPYING).
+
+Snappy copyright: Copyright 2011, Google Inc.
