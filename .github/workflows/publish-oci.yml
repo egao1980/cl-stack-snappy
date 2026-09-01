@@ -114,6 +114,7 @@ jobs:
       package-name: cl-stack-snappy
       version: ${{ needs.resolve-version.outputs.version }}
       registry: ${{ inputs.registry || 'ghcr.io' }}
+      packager-tag: "0.18.0"
       source-paths: |
         cl-stack-snappy.asd
         src
