@@ -2,8 +2,8 @@
 
 MIT. Ships **Snappy** (`libsnappy`) as
 [cl-repository](https://github.com/egao1980/cl-repository) platform overlays,
-plus a thin CFFI `compress` / `decompress` API (raw Snappy, same shape as
-`cl-stack-zstd`). HTTP `Content-Encoding: snappy` is
+plus CFFI and [`compression-protocol`](https://github.com/egao1980/compression-protocol)
+methods for `:snappy` (raw Snappy). HTTP `Content-Encoding: snappy` is
 [`http-encoding-snappy`](https://github.com/egao1980/http-encoding-snappy).
 
 | | |
@@ -25,9 +25,11 @@ plus a thin CFFI `compress` / `decompress` API (raw Snappy, same shape as
 ## Consumer
 
 ```lisp
-;; cl-repository: cl-repo-init.lisp preloads native/. No ensure-*, no LD_LIBRARY_PATH.
+;; Lisp API is compression-protocol. CFFI stays internal.
 (asdf:load-system "cl-stack-snappy")
-(cl-stack-snappy:decompress (cl-stack-snappy:compress octets))
+(compression-protocol:decompress
+ (compression-protocol:compress octets :algorithm :snappy)
+ :algorithm :snappy)
 ```
 
 `:level` on `compress` is accepted and ignored (C API has no level). Gray
