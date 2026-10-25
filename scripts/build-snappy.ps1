@@ -1,11 +1,11 @@
 # Build shared snappy.dll into lib/windows-amd64/.
 # Requires: Visual Studio Build Tools (cmake/cl), curl.
 # Usage: .\scripts\build-snappy.ps1
-# Env: SNAPPY_VERSION (default 1.2.2), DEST_DIR (optional)
+# Env: SNAPPY_VERSION (default 1.3.1), DEST_DIR (optional)
 $ErrorActionPreference = "Stop"
 
 $Root = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$SnappyVersion = if ($env:SNAPPY_VERSION) { $env:SNAPPY_VERSION } else { "1.2.2" }
+$SnappyVersion = if ($env:SNAPPY_VERSION) { $env:SNAPPY_VERSION } else { "1.3.1" }
 $Os = "windows"
 $Arch = "amd64"
 $Out = if ($env:DEST_DIR) { $env:DEST_DIR } else { Join-Path $Root "lib\$Os-$Arch" }

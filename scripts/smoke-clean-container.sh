@@ -2,7 +2,7 @@
 # Clean ubuntu:24.04 linux/amd64 smoke against GHCR cl-stack-snappy.
 set -euo pipefail
 
-VERSION="${1:-1.2.2}"
+VERSION="${1:-1.3.1}"
 IMAGE="ghcr.io/egao1980/cl-systems/cl-stack-snappy:${VERSION}"
 CACHE="${CACHE:-/tmp/cl-stack-snappy-smoke-cache}"
 PKG="$CACHE/pkg/cl-stack-snappy-${VERSION}"

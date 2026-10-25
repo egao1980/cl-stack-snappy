@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Build shared libsnappy into lib/<os>-<arch>/.
 # Usage: ./scripts/build-snappy.sh
-# Env: SNAPPY_VERSION (default 1.2.2), DEST_DIR (optional override)
+# Env: SNAPPY_VERSION (default 1.3.1), DEST_DIR (optional override)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SNAPPY_VERSION="${SNAPPY_VERSION:-1.2.2}"
+SNAPPY_VERSION="${SNAPPY_VERSION:-1.3.1}"
 JOBS="$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)"
 
 uname_s="$(uname -s)"
