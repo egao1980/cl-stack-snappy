@@ -10,7 +10,7 @@ methods for `:snappy` (raw Snappy). HTTP `Content-Encoding: snappy` is
 |--|--|
 | ASDF | `cl-stack-snappy` |
 | GHCR | `ghcr.io/egao1980/cl-systems/cl-stack-snappy:<snappy-ver>` |
-| Upstream | [google/snappy](https://github.com/google/snappy) **1.2.2** |
+| Upstream | [google/snappy](https://github.com/google/snappy) **1.3.1** |
 | Wire | raw Snappy (`snappy-c.h`) — not the framed/streaming format |
 
 ## Platforms
@@ -40,6 +40,6 @@ Smoke (linux/amd64): `scripts/smoke-clean-container.sh` (no `LD_LIBRARY_PATH`).
 ## Build natives locally
 
 ```bash
-./scripts/build-snappy.sh          # SNAPPY_VERSION=1.2.2 by default
+./scripts/build-snappy.sh          # SNAPPY_VERSION=1.3.1 by default
 # → lib/<os>-<arch>/libsnappy*
 ```

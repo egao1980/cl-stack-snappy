@@ -1,7 +1,7 @@
 (in-package #:cl-stack-snappy/tests)
 
 (deftest version
-  (ok (string= +snappy-version+ "1.2.2")))
+  (ok (string= +snappy-version+ "1.3.1")))
 
 (deftest buffer-round-trip
   (let* ((raw (%bytes "hello snappy content-encoding"))

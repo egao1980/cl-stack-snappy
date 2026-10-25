@@ -1,7 +1,7 @@
 (in-package #:cl-stack-snappy)
 
 ;; defparameter: SBCL DEFCONSTANT on strings trips DEFCONSTANT-UNEQL on reload.
-(defparameter +snappy-version+ "1.2.2"
+(defparameter +snappy-version+ "1.3.1"
   "Snappy release this package version tracks (must match ASDF :version / OCI tag).")
 
 (define-condition snappy-error (error)
