@@ -2,75 +2,12 @@
 
 ;; defparameter: SBCL DEFCONSTANT on strings trips DEFCONSTANT-UNEQL on reload.
 (defparameter +snappy-version+ "1.3.1"
-  "Snappy release this package version tracks (must match ASDF :version / OCI tag).")
+  "Snappy release this package tracks: the first three parts of the ASDF :version and OCI tag (the fourth is the package revision).")
 
 (define-condition snappy-error (error)
   ((message :initarg :message :reader snappy-error-message))
   (:report (lambda (c s)
              (format s "Snappy error: ~A" (snappy-error-message c)))))
-
-(defvar *snappy-loaded* nil)
-
-(defun %host-os ()
-  #+windows "windows"
-  #+darwin "darwin"
-  #+linux "linux"
-  #-(or windows darwin linux) "unknown")
-
-(defun %host-arch ()
-  #+(or x86-64 x64) "amd64"
-  #+(or arm64 aarch64) "arm64"
-  #-(or x86-64 x64 arm64 aarch64) "unknown")
-
-(defun %native-search-dirs ()
-  "Overlay native/ (OCI) and lib/<os>-<arch>/ (local build). No LD_LIBRARY_PATH."
-  (let ((dirs '()))
-    (let ((v (uiop:getenv "CL_STACK_SNAPPY_NATIVE")))
-      (when (and v (plusp (length v)))
-        (push v dirs)))
-    (ignore-errors
-      (let* ((sys (asdf:find-system :cl-stack-snappy nil))
-             (root (when sys (asdf:system-source-directory sys))))
-        (when root
-          (push (namestring (merge-pathnames "native/" root)) dirs)
-          (push (namestring
-                 (merge-pathnames (format nil "lib/~A-~A/" (%host-os) (%host-arch)) root))
-                dirs))))
-    (nreverse dirs)))
-
-(defun %lib-candidates ()
-  #+windows '("snappy.dll" "libsnappy.dll")
-  #+darwin '("libsnappy.dylib" "libsnappy.1.dylib")
-  #+(and unix (not darwin)) '("libsnappy.so" "libsnappy.so.1")
-  #-(or windows darwin unix) '("libsnappy.so"))
-
-(defun %find-libsnappy (dir)
-  (dolist (name (%lib-candidates))
-    (let ((p (merge-pathnames name (uiop:ensure-directory-pathname dir))))
-      (when (probe-file p)
-        (return (namestring (truename p)))))))
-
-(defun %absolute-preload (dir)
-  "Load libsnappy by absolute path (cl-repository post-install policy)."
-  (let ((p (%find-libsnappy dir)))
-    (when p
-      (load-foreign-library p)
-      t)))
-
-(defun %load-native ()
-  "Load libsnappy via CFFI search path / absolute preload (not LD_LIBRARY_PATH).
-   Invoked at ASDF load — consumers just call COMPRESS / DECOMPRESS."
-  (unless *snappy-loaded*
-    (let ((preloaded nil))
-      (dolist (dir (%native-search-dirs))
-        (when (and dir (uiop:directory-exists-p dir))
-          (pushnew dir cffi:*foreign-library-directories* :test #'equal)
-          (unless preloaded
-            (setf preloaded (%absolute-preload dir)))))
-      (unless preloaded
-        (load-foreign-library 'libsnappy)))
-    (setf *snappy-loaded* t))
-  (values t +snappy-version+))
 
 (defun %check-snappy (status)
   (case status
@@ -105,7 +42,6 @@
   "Compress OCTETS with raw Snappy. Returns an (unsigned-byte 8) vector.
    LEVEL is accepted for zstd/brotli API parity and ignored — the C API has no level."
   (declare (ignore level))
-  (%load-native)
   (%with-in-ptr octets
     (lambda (in-ptr in-len)
       (let ((bound (max 1 (%snappy-max-compressed-length in-len))))
@@ -117,7 +53,6 @@
 
 (defun decompress (octets)
   "Decompress raw Snappy OCTETS. Returns an (unsigned-byte 8) vector."
-  (%load-native)
   (%with-in-ptr octets
     (lambda (in-ptr in-len)
       (with-foreign-object (plain-len :size)
@@ -133,11 +68,6 @@
 
 (defun valid-compressed-p (octets)
   "True if OCTETS is a well-formed raw Snappy buffer."
-  (%load-native)
   (%with-in-ptr octets
     (lambda (in-ptr in-len)
       (eq :ok (%snappy-validate in-ptr in-len)))))
-
-;;; Auto-load on ASDF load — consumers must not call %LOAD-NATIVE.
-(eval-when (:load-toplevel :execute)
-  (%load-native))

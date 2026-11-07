@@ -1,11 +1,5 @@
 (in-package #:cl-stack-snappy)
 
-(define-foreign-library libsnappy
-  (:darwin (:or "libsnappy.1.dylib" "libsnappy.dylib"))
-  (:unix (:or "libsnappy.so.1" "libsnappy.so"))
-  (:windows (:or "snappy.dll" "libsnappy.dll"))
-  (t (:default "libsnappy")))
-
 (defcenum snappy-status
   (:ok 0)
   (:invalid-input 1)
