@@ -1,5 +1,5 @@
 (defsystem "cl-stack-snappy"
-  :version "1.3.1"
+  :version "1.3.1.1"
   :description "Snappy native overlays + thin CFFI for cl-stack compression"
   :author "egao1980"
   :license "MIT"
