@@ -1,7 +1,10 @@
 (in-package #:cl-stack-snappy)
 
 ;; defparameter: SBCL DEFCONSTANT on strings trips DEFCONSTANT-UNEQL on reload.
-(defparameter +snappy-version+ "1.3.1"
+(defparameter +snappy-version+
+  (let ((parts (uiop:split-string (asdf:component-version (asdf:find-system "cl-stack-snappy"))
+                                  :separator ".")))
+    (format nil "~{~A~^.~}" (subseq parts 0 (min 3 (length parts)))))
   "Snappy release this package tracks: the first three parts of the ASDF :version and OCI tag (the fourth is the package revision).")
 
 (define-condition snappy-error (error)

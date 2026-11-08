@@ -1,5 +1,5 @@
 (defsystem "cl-stack-snappy"
-  :version "1.3.1.1"
+  :version "1.3.1.2"
   :description "Snappy native overlays + thin CFFI for cl-stack compression"
   :author "egao1980"
   :license "MIT"
@@ -15,23 +15,8 @@
                (:file "streams")
                (:file "compression"))
   :in-order-to ((test-op (test-op "cl-stack-snappy/tests")))
-  :properties
-  (:cl-repo
-   (:cffi-libraries ("libsnappy")
-    :provides ("cl-stack-snappy")
-    :overlays
-    ((:platform (:os "linux" :arch "amd64")
-      :layers ((:role "native-library"
-                :files (("lib/linux-amd64/libsnappy.so" . "libsnappy.so")))))
-     (:platform (:os "linux" :arch "arm64")
-      :layers ((:role "native-library"
-                :files (("lib/linux-arm64/libsnappy.so" . "libsnappy.so")))))
-     (:platform (:os "darwin" :arch "arm64")
-      :layers ((:role "native-library"
-                :files (("lib/darwin-arm64/libsnappy.dylib" . "libsnappy.dylib")))))
-     (:platform (:os "windows" :arch "amd64")
-      :layers ((:role "native-library"
-                :files (("lib/windows-amd64/snappy.dll" . "snappy.dll")))))))))
+  ;; Overlays: lib/<os>-<arch>/ per platform, from the :native-library components.
+  :properties (:cl-repo (:provides ("cl-stack-snappy"))))
 
 (defsystem "cl-stack-snappy/tests"
   :depends-on ("cl-stack-snappy" "rove")
