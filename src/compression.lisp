@@ -24,9 +24,10 @@
                     (snappy-error (c)
                       (%as-compression-error ,algorithm c))))
                 (defmethod compression-protocol:make-decompressing-stream-using-algorithm
-                    ((algorithm (eql ,algorithm)) input &key)
+                    ((algorithm (eql ,algorithm)) input &key max-output)
                   (handler-case
-                      (make-decompressing-stream input)
+                      (make-decompressing-stream input :max-output max-output
+                                                       :algorithm ,algorithm)
                     (snappy-error (c)
                       (%as-compression-error ,algorithm c)))))))
   (define-snappy-codec :snappy)
