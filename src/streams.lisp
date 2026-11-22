@@ -19,11 +19,13 @@
           do (loop for i below n do (vector-push-extend (aref buf i) out)))
     (coerce out '(simple-array (unsigned-byte 8) (*)))))
 
-(defun make-decompressing-stream (source)
-  "Return a binary input stream that decompresses octets read from SOURCE."
+(defun make-decompressing-stream (source &key max-output (algorithm :snappy))
+  "Return a binary input stream that decompresses octets read from SOURCE.
+   MAX-OUTPUT: see DECOMPRESS (checked before the output is allocated)."
   (check-type source stream)
   (make-instance 'snappy-decompressing-stream
-                 :data (decompress (%slurp-octets source))))
+                 :data (decompress (%slurp-octets source)
+                                   :max-output max-output :algorithm algorithm)))
 
 (defun make-compressing-stream (source &key level)
   "Return a binary input stream that compresses octets read from SOURCE."

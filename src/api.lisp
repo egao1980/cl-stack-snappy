@@ -54,13 +54,20 @@
           (%check-snappy (%snappy-compress in-ptr in-len out out-len))
           (%copy-foreign-octets out (mem-ref out-len :size)))))))
 
-(defun decompress (octets)
-  "Decompress raw Snappy OCTETS. Returns an (unsigned-byte 8) vector."
+(defun decompress (octets &key max-output (algorithm :snappy))
+  "Decompress raw Snappy OCTETS. Returns an (unsigned-byte 8) vector.
+   MAX-OUTPUT caps the length the preamble declares: past it, signal
+   COMPRESSION-PROTOCOL:COMPRESSION-LIMIT-EXCEEDED (for ALGORITHM) before
+   allocating anything."
+  (when max-output (check-type max-output (integer 0)))
   (%with-in-ptr octets
     (lambda (in-ptr in-len)
       (with-foreign-object (plain-len :size)
         (%check-snappy (%snappy-uncompressed-length in-ptr in-len plain-len))
         (let ((cap (mem-ref plain-len :size)))
+          (when (and max-output (> cap max-output))
+            (error 'compression-protocol:compression-limit-exceeded
+                   :algorithm algorithm :limit max-output))
           (if (zerop cap)
               (make-array 0 :element-type '(unsigned-byte 8))
               (with-foreign-objects ((out :uint8 cap)

@@ -35,6 +35,11 @@ methods for `:snappy` (raw Snappy). HTTP `Content-Encoding: snappy` is
 `:level` on `compress` is accepted and ignored (C API has no level). Gray
 streams slurp then wrap the one-shot C API.
 
+`decompress … :max-output N` (and `make-decompressing-stream … :max-output N`)
+checks the length the Snappy preamble declares before allocating the output,
+and signals `compression-protocol:compression-limit-exceeded` past N.
+`compression-protocol:decompress :max-output` passes N down (0.4.0+).
+
 Smoke (linux/amd64): `scripts/smoke-clean-container.sh` (no `LD_LIBRARY_PATH`).
 
 ## Build natives locally
