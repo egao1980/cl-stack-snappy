@@ -1,10 +1,10 @@
 (defsystem "cl-stack-snappy"
-  :version "1.3.1.3"
+  :version "1.3.1.4"
   :description "Snappy native overlays + thin CFFI for cl-stack compression"
   :author "egao1980"
   :license "MIT"
   :defsystem-depends-on ("asdf-native")
-  :depends-on ("cffi" "trivial-gray-streams" (:version "compression-protocol" "0.4.0"))
+  :depends-on ("cffi" (:version "buffer-protocol" "0.1.0") "trivial-gray-streams" (:version "compression-protocol" "0.4.0"))
   :serial t
   :pathname "src"
   :components ((:file "package")

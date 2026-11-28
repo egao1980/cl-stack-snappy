@@ -11,13 +11,8 @@
 (defclass snappy-compressing-stream (snappy-octet-stream) ())
 
 (defun %slurp-octets (stream)
-  (let ((out (make-array 0 :element-type '(unsigned-byte 8)
-                         :adjustable t :fill-pointer 0))
-        (buf (make-array 4096 :element-type '(unsigned-byte 8))))
-    (loop for n = (read-sequence buf stream)
-          while (plusp n)
-          do (loop for i below n do (vector-push-extend (aref buf i) out)))
-    (coerce out '(simple-array (unsigned-byte 8) (*)))))
+  "All of STREAM, read straight into a growing vector (#12)."
+  (stack-buffer:read-stream-octets stream))
 
 (defun make-decompressing-stream (source &key max-output (algorithm :snappy))
   "Return a binary input stream that decompresses octets read from SOURCE.

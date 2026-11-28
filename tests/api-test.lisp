@@ -36,3 +36,11 @@
 (deftest bad-input
   (ok (signals (decompress (%bytes "not-snappy!!!!")) 'snappy-error))
   (ok (not (valid-compressed-p (%bytes "not-snappy!!!!")))))
+
+(deftest bulk-paths-large-and-edge-sizes
+  "#12: uncompress straight into the result, memcpy out of compress, chunked slurp."
+  (dolist (n '(0 1 4095 1000003))
+    (let ((raw (make-array n :element-type '(unsigned-byte 8))))
+      (dotimes (i n) (setf (aref raw i) (mod (* i 31) 256)))
+      (ok (equalp raw (cl-stack-snappy:decompress (cl-stack-snappy:compress raw)))
+          (format nil "~D bytes" n)))))
