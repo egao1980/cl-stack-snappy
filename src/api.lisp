@@ -27,10 +27,8 @@
      (make-array (length octets) :element-type '(unsigned-byte 8) :initial-contents octets))))
 
 (defun %copy-foreign-octets (ptr n)
-  (let ((result (make-array n :element-type '(unsigned-byte 8))))
-    (dotimes (i n)
-      (setf (aref result i) (mem-aref ptr :uint8 i)))
-    result))
+  "One memcpy (buffer-protocol), not a mem-aref per byte (#12)."
+  (stack-buffer:foreign-to-vector ptr n))
 
 (defun %with-in-ptr (octets fn)
   "Call FN with a pointer to OCTETS (null if empty)."
@@ -70,11 +68,14 @@
                    :algorithm algorithm :limit max-output))
           (if (zerop cap)
               (make-array 0 :element-type '(unsigned-byte 8))
-              (with-foreign-objects ((out :uint8 cap)
-                                     (out-len :size))
-                (setf (mem-ref out-len :size) cap)
-                (%check-snappy (%snappy-uncompress in-ptr in-len out out-len))
-                (%copy-foreign-octets out (mem-ref out-len :size)))))))))
+              ;; The length is known up front: uncompress into the result itself.
+              (let ((out (make-array cap :element-type '(unsigned-byte 8))))
+                (with-foreign-object (out-len :size)
+                  (setf (mem-ref out-len :size) cap)
+                  (with-pointer-to-vector-data (out-ptr out)
+                    (%check-snappy (%snappy-uncompress in-ptr in-len out-ptr out-len)))
+                  (let ((n (mem-ref out-len :size)))
+                    (if (= n cap) out (subseq out 0 n)))))))))))
 
 (defun valid-compressed-p (octets)
   "True if OCTETS is a well-formed raw Snappy buffer."
